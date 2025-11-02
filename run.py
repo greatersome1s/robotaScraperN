@@ -4,7 +4,7 @@ from time import sleep
 
 with Robota() as bot:
     bot.start_page()
-    bot.choose_location("Київ")
+    bot.choose_location()
     # bot.choose_worktype()
     bot.choose_salary(const.SALARY_ANY)
     bot.filter()

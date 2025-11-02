@@ -112,7 +112,10 @@ class Robota(webdriver.Chrome):
                 # will use to find other info later on so don't convert to text
                 job_name = i.find_element(By.TAG_NAME, 'h2')
                 try:
-                    job_salary = job_name.find_element(By.XPATH, ".//folowing-sibling/span[contains(text()='₴')]").text.strip()
+                    job_salary = job_name.find_element(
+                        By.XPATH,
+                        ".//following-sibling::div/span"
+                    ).text.strip()
                 except:
                     job_salary = "Не вказано"
                 # find mutual parent for company info and location
@@ -163,7 +166,10 @@ class Robota(webdriver.Chrome):
                 # will use to find other info later on so don't convert to text
                 job_name = i.find_element(By.TAG_NAME, 'h2')
                 try:
-                    job_salary = job_name.find_element(By.XPATH, ".//folowing-sibling/span[contains(text()='₴')]").text.strip()
+                    job_salary = job_name.find_element(
+                        By.XPATH,
+                        ".//following-sibling::div/span"
+                    ).text.strip()
                 except:
                     job_salary = "Не вказано"
                 # find mutual parent for company info and location
