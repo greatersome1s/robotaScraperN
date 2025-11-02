@@ -116,6 +116,10 @@ class Robota(webdriver.Chrome):
                         By.XPATH,
                         ".//following-sibling::div/span"
                     ).text.strip()
+                    if "₴" in job_salary:
+                        pass
+                    else:
+                        job_salary = "Не вказано"
                 except:
                     job_salary = "Не вказано"
                 # find mutual parent for company info and location
@@ -170,6 +174,10 @@ class Robota(webdriver.Chrome):
                         By.XPATH,
                         ".//following-sibling::div/span"
                     ).text.strip()
+                    if "₴" in job_salary:
+                        pass
+                    else:
+                        job_salary = "Не вказано"
                 except:
                     job_salary = "Не вказано"
                 # find mutual parent for company info and location
