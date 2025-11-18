@@ -7,8 +7,12 @@ from time import sleep
 from math import floor
 import csv
 from pathlib import Path
+driver = webdriver.Firefox
 
-class Robota(webdriver.Chrome):
+def chooseWebdriver(driver):
+    driver = driver
+
+class Robota(driver):
     def __init__(self, options = None, service = None, keep_alive = True):
         super().__init__(options, service, keep_alive)
         self.info = []
@@ -41,6 +45,7 @@ class Robota(webdriver.Chrome):
             self.find_element(By.XPATH, "//input[contains(@id, 'toggler-')]/following-sibling::span").click()
             
     # Requires to send list with constants to filter on calling
+    # Note: the site itself chooses location to Ukraine-wide if remote filter enabled
     def filter(self, filter_list: list = [const.FILTER_REMOTE]):
         newlist = filter_list
         self.implicitly_wait(2)
@@ -148,7 +153,6 @@ class Robota(webdriver.Chrome):
                 next_url.rstrip(";")
             else:
                 next_url = zapros_url + f"/params;page={current_page}"
-            print(next_url)
             self.get(next_url)
             WebDriverWait(self, 5).until(EC.staleness_of(listing_section))
             new_listing_section = WebDriverWait(self, 5).until(EC.presence_of_element_located(listing_section_locator))
@@ -202,7 +206,22 @@ class Robota(webdriver.Chrome):
     def save(self, file_name=None):
         # generate file name if not given
         if file_name==None:
-            file_name=self.search_text.strip().replace(" ", "-") + ".csv"
+            base_name = self.search_text.strip().replace(" ", "-")
+            bs0_var = base_name + "-0.csv"
+            zeroFileDir = Path(__file__).parent.parent/"csvStorage"
+            zeroFilePath = zeroFileDir/bs0_var
+            if zeroFilePath.is_file():
+                finalIndex = 0
+                for i in zeroFileDir.glob(f"{base_name}-*.csv"):
+                    try:
+                        num_str = i.name[i.name.rfind("-") + 1 : -4]
+                        print(num_str)
+                        finalIndex = int(num_str)+1
+                    except:
+                        print('error')
+                file_name = base_name + f"-{finalIndex}.csv"
+            else:
+                file_name = bs0_var
         
         fieldnames_ = [
             'Title', 'Salary', 'Company', 'Location'
@@ -211,13 +230,26 @@ class Robota(webdriver.Chrome):
         file_path = Path(__file__).parent.parent/"csvStorage"/file_name
         
         if file_path.is_file():
-            toadd_list = []
-            with open(file_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                row_list = []
-                for row in reader:
-                    row_list.append(row)
-                print(row_list)
+            tmp_list = []
+            with open(file_path, 'r', encoding='utf-8', newline="") as f:
+                next(f)
+                for row in f.readlines():
+                    cols = row.strip().split(",")
+                    tmp_dict = {
+                        "Title": cols[0],
+                        "Salary": cols[1],
+                        "Company": cols[2],
+                        "Location": cols[3]
+                    }
+                    tmp_list.append(tmp_dict)
+            to_add_list = self.info
+            for i in tmp_list:
+                if i in to_add_list:
+                    to_add_list.remove(i)
+            if len(to_add_list)>0:
+                with open(file_path, "a", encoding='utf-8', newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=fieldnames_)
+                    writer.writerows(to_add_list)
         else:
             with open(file_path, "w", encoding="utf-8", newline="") as f:
                 dictWriter = csv.DictWriter(f, fieldnames=fieldnames_)
