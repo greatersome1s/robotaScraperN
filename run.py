@@ -8,10 +8,10 @@ from time import sleep
 
 with Robota() as bot:
     bot.start_page()
-    bot.choose_location("Дніпро")
+    bot.choose_location("Львів")
     # bot.choose_worktype()
     bot.choose_salary(const.SALARY_50K)
     # bot.filter()
-    bot.search_job("python developer")
+    bot.search_job("c++ developer")
     bot.parse()
-    bot.save("python-developer-0.csv")
+    bot.save("c++-developer-0.csv")
